@@ -120,3 +120,33 @@ def create_customer(customer_name, customer_email):
     response.raise_for_status()
     customer = response.json()['data']
     return customer
+
+
+def create_product(product):
+    access_token = get_elastic_path_access_token()
+    url = 'https://api.moltin.com/v2/customers'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    slug = translit(product['name'], 'ru', reversed=True).replace(' ', '-')
+    payload = {
+        'data': {
+            'type': 'product',
+            'name': product['name'],
+            'slug': slug,
+            'sku': product['name'],
+            'manage_stock': False,
+            'description': product['description'],
+            'status': 'live',
+            'commodity_type': 'physical',
+            'price': [
+                {
+                    "amount": product['price'] * 100,
+                    "currency": "RUB",
+                    "includes_tax": True
+                }
+            ]
+        }
+    }
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
+    created_product = response.json()
+    return created_product['data']['id']
