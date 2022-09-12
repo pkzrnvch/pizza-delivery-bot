@@ -225,3 +225,40 @@ def create_flow_field(flow_id, field):
     response.raise_for_status()
     created_field = response.json()['data']
     return created_field['id']
+
+
+def create_flow_entry(flow_slug, field_values):
+    access_token = get_elastic_path_access_token()
+    url = f'https://api.moltin.com/v2/flows/{flow_slug}/entries'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    payload = {
+        'data': {
+            'type': 'entry'
+        }
+    }
+    for field_name, field_value in field_values.items():
+        payload['data'][field_name] = field_value
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
+    created_flow_entry = response.json()['data']
+    return created_flow_entry['id']
+
+
+def get_all_entries(flow_slug):
+    access_token = get_elastic_path_access_token()
+    url = f'https://api.moltin.com/v2/flows/{flow_slug}/entries'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    entries = response.json()['data']
+    return entries
+
+
+def get_entry(flow_slug, entry_id):
+    access_token = get_elastic_path_access_token()
+    url = f'https://api.moltin.com/v2/flows/{flow_slug}/entries/{entry_id}'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    entry = response.json()['data']
+    return entry
