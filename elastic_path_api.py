@@ -150,3 +150,30 @@ def create_product(product):
     response.raise_for_status()
     created_product = response.json()
     return created_product['data']['id']
+
+
+def create_file(image_url):
+    access_token = get_elastic_path_access_token()
+    url = 'https://api.moltin.com/v2/files'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    files = {
+        'file_location': (None, image_url),
+    }
+    response = requests.post(url, headers=headers, files=files)
+    response.raise_for_status()
+    created_file = response.json()['data']
+    return created_file['id']
+
+
+def set_product_main_image(product_id, image_id):
+    access_token = get_elastic_path_access_token()
+    url = f'https://api.moltin.com/v2/products/{product_id}/relationships/main-image'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    payload = {
+        'data': {
+            'id': image_id,
+            'type': 'main_image'
+        }
+    }
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
