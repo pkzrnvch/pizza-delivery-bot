@@ -177,3 +177,51 @@ def set_product_main_image(product_id, image_id):
     }
     response = requests.post(url, headers=headers, json=payload)
     response.raise_for_status()
+
+
+def create_flow(flow_name, flow_description):
+    access_token = get_elastic_path_access_token()
+    url = 'https://api.moltin.com/v2/flows'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    payload = {
+        'data': {
+            'type': 'flow',
+            'name': flow_name,
+            'slug': flow_name,
+            'description': flow_description,
+            'enabled': True
+        }
+    }
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
+    created_flow = response.json()['data']
+    return created_flow['id']
+
+
+def create_flow_field(flow_id, field):
+    access_token = get_elastic_path_access_token()
+    url = 'https://api.moltin.com/v2/fields'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    payload = {
+        'data': {
+            'type': 'field',
+            'name': field['name'],
+            'slug': field['name'],
+            'field_type': field['type'],
+            'description': field['description'],
+            'required': True,
+            'enabled': True,
+            'relationships': {
+                'flow': {
+                    'data': {
+                        'type': 'flow',
+                        'id': flow_id,
+                    }
+                }
+            }
+        }
+    }
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
+    created_field = response.json()['data']
+    return created_field['id']
