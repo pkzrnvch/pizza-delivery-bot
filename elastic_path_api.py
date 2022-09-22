@@ -3,7 +3,6 @@ import time
 from pathlib import Path
 
 import requests
-from transliterate import translit
 
 ACCESS_TOKEN = None
 EXPIRATION_TIME = None
@@ -59,7 +58,7 @@ def get_product_image(file_id):
     image_metadata = response.json()['data']
     image_directory = Path('./images')
     Path.mkdir(image_directory, exist_ok=True)
-    image_path = Path(image_directory, image_metadata['file_name'])
+    image_path = Path(image_directory, image_metadata['id']+'.jpg')
     if not image_path.exists():
         response = requests.get(image_metadata['link']['href'])
         response.raise_for_status()
@@ -124,14 +123,13 @@ def create_customer(customer_name, customer_email):
 
 def create_product(product):
     access_token = get_elastic_path_access_token()
-    url = 'https://api.moltin.com/v2/customers'
+    url = 'https://api.moltin.com/v2/products'
     headers = {'Authorization': f'Bearer {access_token}'}
-    slug = translit(product['name'], 'ru', reversed=True).replace(' ', '-')
     payload = {
         'data': {
             'type': 'product',
             'name': product['name'],
-            'slug': slug,
+            'slug': str(product['id']),
             'sku': product['name'],
             'manage_stock': False,
             'description': product['description'],
@@ -148,11 +146,11 @@ def create_product(product):
     }
     response = requests.post(url, headers=headers, json=payload)
     response.raise_for_status()
-    created_product = response.json()
-    return created_product['data']['id']
+    created_product = response.json()['data']
+    return created_product['id']
 
 
-def create_file(image_url):
+def create_image(image_url):
     access_token = get_elastic_path_access_token()
     url = 'https://api.moltin.com/v2/files'
     headers = {'Authorization': f'Bearer {access_token}'}
