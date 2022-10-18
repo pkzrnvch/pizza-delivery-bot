@@ -368,6 +368,16 @@ def precheckout_callback(update: Update, context: CallbackContext):
         query.answer(ok=True)
 
 
+def follow_up_order(context: CallbackContext):
+    follow_up_message = 'Если вы до сих пор не получили вашу пиццу - ' \
+                        'свяжитесь с нами, и следующий заказ будет за' \
+                        'наш счет. Будем рады новым заказам!'
+    context.bot.send_message(
+        chat_id=context.job.context,
+        text=follow_up_message,
+    )
+
+
 def successful_order_callback(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     name = context.user_data.get('name')
@@ -410,6 +420,7 @@ def successful_order_callback(update: Update, context: CallbackContext):
         chat_id=chat_id,
         text='Спасибо за заказ!'
     )
+    context.job_queue.run_once(follow_up_order, 3600, context=chat_id)
     context.bot.send_message(
         chat_id=chat_id,
         text='Добрый день! Пожалуйста, выберите пиццу:',
