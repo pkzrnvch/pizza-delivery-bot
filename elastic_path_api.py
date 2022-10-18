@@ -104,7 +104,7 @@ def fetch_cart(cart_id):
     return cart
 
 
-def create_customer(customer_name, customer_email):
+def create_customer(customer_name, customer_email, latitude, longitude):
     access_token = get_elastic_path_access_token()
     url = 'https://api.moltin.com/v2/customers'
     headers = {'Authorization': f'Bearer {access_token}'}
@@ -112,7 +112,9 @@ def create_customer(customer_name, customer_email):
         'data': {
             'type': 'customer',
             'name': customer_name,
-            'email': customer_email
+            'email': customer_email,
+            'lat': latitude,
+            'lon': longitude
         }
     }
     response = requests.post(url, headers=headers, json=payload)
@@ -196,7 +198,7 @@ def create_flow(flow_name, flow_description):
     return created_flow['id']
 
 
-def create_flow_field(flow_id, field):
+def create_flow_field(flow_id, field: dict):
     access_token = get_elastic_path_access_token()
     url = 'https://api.moltin.com/v2/fields'
     headers = {'Authorization': f'Bearer {access_token}'}
