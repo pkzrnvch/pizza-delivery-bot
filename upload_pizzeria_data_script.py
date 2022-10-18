@@ -48,6 +48,11 @@ def main():
             'name': 'lat',
             'description': 'latitude',
             'type': 'float'
+        },
+        {
+            'name': 'delivery_chat_id',
+            'description': 'chat id for delivery notifications',
+            'type': 'integer'
         }
     ]
     for field in pizzerias_flow_fields:
@@ -60,9 +65,29 @@ def main():
             'alias': pizzeria['alias'],
             'address': pizzeria['address']['full'],
             'lon': float(pizzeria['coordinates']['lon']),
-            'lat': float(pizzeria['coordinates']['lat'])
+            'lat': float(pizzeria['coordinates']['lat']),
+            'delivery_chat_id': 30952486
         }
         create_flow_entry('pizzerias', flow_fields)
+
+    customers_flow_id = create_flow(
+        'Customers',
+        'Extends the default customer model'
+    )
+    customer_fields = [
+        {
+            'name': 'lon',
+            'description': 'customer location longitude',
+            'type': 'float'
+        },
+        {
+            'name': 'lat',
+            'description': 'customer location latitude',
+            'type': 'float'
+        }
+    ]
+    for field in customer_fields:
+        create_flow_field(customers_flow_id, field)
 
 
 if __name__ == '__main__':
